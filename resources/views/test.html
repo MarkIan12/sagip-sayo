@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mandaluyong Vector Map — Incident Logs</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2m0s6v2QbKX1p3y3d1FQHnXjvKkRk6t3w6u3w0A="
+    crossorigin=""
+  />
+  <style>
+    :root{
+      --sidebar-w: 320px;
+    }
+    html,body,#map { height:100%; margin:0; padding:0; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .container { display:flex; height:100vh; }
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: 260px;
+      max-width: 420px;
+      border-right:1px solid #e6e6e6;
+      padding:12px;
+      box-sizing:border-box;
+      overflow:auto;
+      background: #fafafa;
+    }
+    #map { flex:1; }
+    h2{ margin:6px 0 12px 0; font-size:16px; }
+    .area-list { list-style:none; padding:0; margin:0; }
+    .area-list li { padding:8px; border-radius:6px; margin-bottom:6px; cursor:pointer; border:1px solid transparent; }
+    .area-list li:hover { background:#f0f0f0; border-color:#e0e0e0; }
+    .count-badge {
+      float:right;
+      background:#333;
+      color:white;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:12px;
+    }
+    .controls { margin-bottom:10px; }
+    .btn {
+      display:inline-block;
+      padding:8px 10px;
+      border-radius:6px;
+      border:1px solid #ddd;
+      background:white;
+      cursor:pointer;
+      margin-right:6px;
+      font-size:13px;
+    }
+    .modal {
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,0.35); z-index:9999; visibility:hidden; opacity:0; transition:opacity .12s;
+    }
+    .modal.show { visibility:visible; opacity:1; }
+    .modal-card {
+      background:white; padding:16px; border-radius:8px; width:420px; max-width:90%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    label{ display:block; margin-top:8px; font-size:13px; }
+    input[type="text"], textarea, select {
+      width:100%; padding:8px; box-sizing:border-box; margin-top:6px; border-radius:6px; border:1px solid #ddd;
+    }
+    footer.small { font-size:12px; color:#666; margin-top:12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Mandaluyong — Incident Log Map</h2>
+      <div class="controls">
+        <button id="zoomAll" class="btn">Zoom to all</button>
+        <button id="clearIncidents" class="btn">Clear incidents</button>
+        <input id="geojsonUploader" type="file" accept=".geojson,application/geo+json" style="margin-top:8px" />
+      </div>
+
+      <div>
+        <strong>Areas</strong>
+        <ul id="areas" class="area-list"></ul>
+      </div>
+
+      <div style="margin-top:12px;">
+        <strong>Selected area incidents</strong>
+        <div id="selectedIncidents" style="margin-top:8px; min-height:40px; border:1px dashed #eee; padding:8px; border-radius:6px;">
+          <em>No area selected</em>
+        </div>
+      </div>
+
+      <footer class="small">
+        Demo stores incidents locally in your browser (localStorage). Replace the GeoJSON file with official barangay boundaries for real deployment.
+      </footer>
+    </div>
+
+    <div id="map"></div>
+  </div>
+
+  <!-- Modal for adding incident -->
+  <div id="modal" class="modal" role="dialog" aria-hidden="true">
+    <div class="modal-card">
+      <h3 id="modalTitle">Log incident</h3>
+      <form id="incidentForm">
+        <label>Area</label>
+        <input type="text" id="areaName" readonly />
+        <label>Description</label>
+        <textarea id="incidentDesc" rows="4" required></textarea>
+        <label>Severity</label>
+        <select id="severity">
+          <option value="low">Low</option>
+          <option value="moderate">Moderate</option>
+          <option value="high">High</option>
+        </select>
+        <div style="text-align:right; margin-top:10px;">
+          <button type="button" id="cancelBtn" class="btn">Cancel</button>
+          <button type="submit" class="btn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-ogm6b8Xq04Q7Y4b2gqXbqL0t1QY6Qm4Q+gkM6sGmQG0="
+    crossorigin=""
+  ></script>
+
+  <script>
+  /*************** Sample fallback GeoJSON (simple mock polygons) ***************/
+  const sampleGeoJSON = {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type":"Feature",
+        "properties": { "id": "A1", "name": "Sample Barangay 1" },
+        "geometry": {
+          "type":"Polygon",
+          "coordinates":[[
+            [121.031, 14.577],
+            [121.033, 14.577],
+            [121.033, 14.579],
+            [121.031, 14.579],
+            [121.031, 14.577]
+          ]]
+        }
+      },
+      {
+        "type":"Feature",
+        "properties": { "id": "A2", "name": "Sample Barangay 2" },
+        "geometry": {
+          "type":"Polygon",
+          "coordinates":[[
+            [121.035, 14.576],
+            [121.037, 14.576],
+            [121.037, 14.578],
+            [121.035, 14.578],
+            [121.035, 14.576]
+          ]]
+        }
+      }
+    ]
+  };
+
+  /*********************** Map initialization *************************/
+  const map = L.map('map', {minZoom: 12}).setView([14.578, 121.035], 14);
+
+  // lightweight basemap (OpenStreetMap)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  let geojsonLayer;
+  let areasIndex = {}; // id => feature
+  let selectedAreaId = null;
+
+  // incidents storage (localStorage key)
+  const INCIDENT_KEY = 'mandaluyong_incidents_v1';
+
+  /** load incidents from storage **/
+  function loadIncidents() {
+    try {
+      const raw = localStorage.getItem(INCIDENT_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+  function saveIncidents(arr) {
+    localStorage.setItem(INCIDENT_KEY, JSON.stringify(arr));
+  }
+
+  /************* Styling & color by incident count *************/
+  function getCounts() {
+    const incidents = loadIncidents();
+    const counts = {};
+    incidents.forEach(i => counts[i.areaId] = (counts[i.areaId]||0)+1);
+    return counts;
+  }
+
+  function colorForCount(c){
+    // simple scale: 0 -> light, 1-2 -> orange, 3+ -> red
+    if(!c || c===0) return '#f2f2f2';
+    if(c < 3) return '#ffd580';
+    return '#ff8a8a';
+  }
+
+  function styleFeature(feature) {
+    const id = feature.properties.id || feature.properties.NAME || feature.properties.name || feature.properties.barangay || 'unknown';
+    const counts = getCounts();
+    const count = counts[id] || 0;
+    return {
+      weight: 1,
+      opacity: 1,
+      color: '#999',
+      fillOpacity: 0.9,
+      fillColor: colorForCount(count)
+    };
+  }
+
+  /****************** Rendering GeoJSON & UI ************************/
+  function onEachFeature(feature, layer) {
+    const props = feature.properties || {};
+    const id = props.id || props.NAME || props.name || 'area-' + Math.random().toString(36).slice(2,7);
+    props.id = id; // ensure id exists
+    areasIndex[id] = feature;
+
+    layer.on({
+      click: (e) => {
+        selectedAreaId = id;
+        showModalForArea(feature);
+      }
+    });
+
+    // tooltip with name + count
+    layer.bindTooltip(() => {
+      const counts = getCounts();
+      const cnt = counts[id]||0;
+      const nm = props.name || props.bgy || props.NAME || id;
+      return `${nm} — incidents: ${cnt}`;
+    }, {sticky:true});
+  }
+
+  function renderGeoJSON(geojson) {
+    if(geojsonLayer) { geojsonLayer.remove(); areasIndex = {}; selectedAreaId=null; }
+    geojsonLayer = L.geoJSON(geojson, {
+      style: styleFeature,
+      onEachFeature: onEachFeature
+    }).addTo(map);
+
+    // fit to layer bounds
+    try {
+      map.fitBounds(geojsonLayer.getBounds(), {padding:[20,20]});
+    } catch(e) {}
+
+    // populate sidebar list
+    const list = document.getElementById('areas');
+    list.innerHTML = '';
+    Object.values(areasIndex).forEach(f => {
+      const p = f.properties || {};
+      const id = p.id;
+      const name = p.name || p.NAME || id;
+      const li = document.createElement('li');
+      const counts = getCounts();
+      const cnt = counts[id]||0;
+      li.innerHTML = `<span>${name}</span><span class="count-badge">${cnt}</span>`;
+      li.onclick = () => {
+        // zoom to feature
+        const layer = geojsonLayer.getLayers().find(l => {
+          return l.feature && (l.feature.properties.id === id);
+        });
+        if(layer) {
+          map.fitBounds(layer.getBounds(), {maxZoom:17});
+          // flash
+          layer.setStyle({weight:3, color:'#333'});
+          setTimeout(()=> layer.setStyle(styleFeature(layer.feature)), 600);
+        }
+      };
+      list.appendChild(li);
+    });
+
+    // refresh selected area incident panel
+    refreshSelectedPanel();
+  }
+
+  /**************** Modal & incident creation *******************/
+  const modal = document.getElementById('modal');
+  const areaNameInput = document.getElementById('areaName');
+  const incidentForm = document.getElementById('incidentForm');
+  const incidentDesc = document.getElementById('incidentDesc');
+  const severitySel = document.getElementById('severity');
+  const selectedIncidentsDiv = document.getElementById('selectedIncidents');
+
+  function showModalForArea(feature) {
+    const name = feature.properties.name || feature.properties.NAME || feature.properties.id;
+    areaNameInput.value = name;
+    document.getElementById('modalTitle').textContent = 'Log incident for ' + name;
+    incidentDesc.value = '';
+    severitySel.value = 'low';
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  }
+
+  function hideModal() {
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  document.getElementById('cancelBtn').addEventListener('click', (e)=>{
+    e.preventDefault(); hideModal();
+  });
+
+  incidentForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const desc = incidentDesc.value.trim();
+    if(!desc) return alert('Please enter a description');
+    const areaName = areaNameInput.value;
+    const severity = severitySel.value;
+    // find area id by name (robust fallback)
+    let areaId = null;
+    for(const id in areasIndex){
+      const p = areasIndex[id].properties || {};
+      if( (p.name && p.name === areaName) || (p.NAME && p.NAME === areaName) || id === areaName) {
+        areaId = id; break;
+      }
+    }
+    if(!areaId){
+      // use selectedAreaId if available
+      areaId = selectedAreaId || Object.keys(areasIndex)[0];
+    }
+    const incidents = loadIncidents();
+    incidents.push({
+      id: 'inc_' + Date.now(),
+      areaId,
+      areaName,
+      description: desc,
+      severity,
+      createdAt: new Date().toISOString()
+    });
+    saveIncidents(incidents);
+    hideModal();
+    // re-render styling & sidebar counts
+    renderGeoJSON(geojsonLayer.toGeoJSON());
+  });
+
+  // close modal on background click
+  modal.addEventListener('click', (ev)=>{
+    if(ev.target === modal) hideModal();
+  });
+
+  function refreshSelectedPanel(){
+    if(!selectedAreaId) {
+      selectedIncidentsDiv.innerHTML = '<em>No area selected — click an area to log incidents</em>';
+      return;
+    }
+    const incidents = loadIncidents().filter(i => i.areaId === selectedAreaId);
+    if(incidents.length === 0) {
+      selectedIncidentsDiv.innerHTML = '<em>No incidents for this area yet.</em>';
+      return;
+    }
+    selectedIncidentsDiv.innerHTML = '<ul style="padding-left:16px;margin:0;">' + incidents.map(it => {
+      return `<li style="margin-bottom:6px"><strong>[${it.severity}]</strong> ${new Date(it.createdAt).toLocaleString()}<br>${escapeHtml(it.description)}</li>`;
+    }).join('') + '</ul>';
+  }
+
+  // utility escape
+  function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+  /**************** Controls ********************/
+  document.getElementById('zoomAll').addEventListener('click', ()=> {
+    if(geojsonLayer) map.fitBounds(geojsonLayer.getBounds(), {padding:[20,20]});
+  });
+
+  document.getElementById('clearIncidents').addEventListener('click', ()=>{
+    if(confirm('Clear all stored incidents?')) {
+      saveIncidents([]);
+      if(geojsonLayer) renderGeoJSON(geojsonLayer.toGeoJSON());
+    }
+  });
+
+  // geojson uploader (drag your mandaluyong.geojson)
+  document.getElementById('geojsonUploader').addEventListener('change', (e)=>{
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = function() {
+      try {
+        const parsed = JSON.parse(reader.result);
+        renderGeoJSON(parsed);
+      } catch(err) {
+        alert('Invalid GeoJSON file: ' + err.message);
+      }
+    };
+    reader.readAsText(f);
+  });
+
+  /*********** On map click: choose nearest polygon or open modal ***********/
+  map.on('click', function(evt){
+    // find polygon layer at clicked point
+    let clickedFeatureId = null;
+    geojsonLayer.eachLayer(layer => {
+      if(layer instanceof L.Path && layer.getBounds && layer.getBounds().contains(evt.latlng)){
+        if(layer.feature && layer.feature.properties) clickedFeatureId = layer.feature.properties.id;
+      }
+    });
+    if(clickedFeatureId){
+      selectedAreaId = clickedFeatureId;
+      const f = areasIndex[clickedFeatureId];
+      if(f) showModalForArea(f);
+      refreshSelectedPanel();
+    }
+  });
+
+  /********** Initial load: try to fetch a "mandaluyong.geojson" next to file, else fallback **********/
+  (async function initialLoad(){
+    try {
+      // try to fetch local file "mandaluyong.geojson" (place in same folder)
+      const resp = await fetch('mandaluyong.geojson');
+      if(!resp.ok) throw new Error('no local geojson');
+      const data = await resp.json();
+      renderGeoJSON(data);
+    } catch(err) {
+      // fallback: use embedded sample geojson
+      console.warn('Falling back to sample geojson (place real mandaluyong.geojson in same folder to override).', err);
+      renderGeoJSON(sampleGeoJSON);
+    }
+  })();
+
+  // refresh selected panel whenever incidents change (simple interval)
+  setInterval(refreshSelectedPanel, 1200);
+
+  </script>
+</body>
+</html>
