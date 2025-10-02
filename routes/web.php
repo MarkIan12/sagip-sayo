@@ -14,7 +14,18 @@ use Illuminate\Support\Facades\Auth;
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/','HomeController@index')->name('home');
+
     Route::get('/home', 'HomeController@index')->name('home');
+
+    Route::get('/incidents','IncidentController@index')->name('incidents.index');
+    Route::get('/incidents/create','IncidentController@create')->name('incidents.create');
+
+    Route::post('/incidents/store','IncidentController@store')->name('incidents.store');
+    Route::get('/incidents/{id}/edit','IncidentController@edit')->name('incidents.edit');
+    Route::post('incidents/update/{id}','IncidentController@update')->name('incidents.update');
+
+
+    Route::get('reports','IncidentReportController@index')->name('incidents.report');
 
     // Barangays
     Route::get('/barangays', 'BarangayController@index')->name('barangays');
@@ -39,5 +50,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('update_user/{id}', 'UserController@update');
     Route::post('user_change_password/{id}', 'UserController@userChangePassword');
     Route::post('deactivate/{id}', 'UserController@deactivate');
+
 
 });

@@ -1,0 +1,361 @@
+@extends('layouts.header')
+
+@section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+    #map {
+        height: 300px;
+        width: 100%;
+        border: 1px solid #ddd;
+        margin-top: 10px;
+    }
+    .required::after {
+        content: " *";
+        color: red;
+    }
+    .optional {
+        font-style: italic;
+        font-size: 0.9em;
+        color: #666;
+        margin-left: 5px;
+    }
+</style>
+@endsection
+
+@section('content')
+@include('error')
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Create Incident</h5>
+            </div>
+
+            <div class="card-body">
+                <form action="{{ url('incidents/store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="row g-3">
+                        <!-- Date/Time -->
+                        <div class="col-md-2">
+                            <label class="required">Date</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="required">Time</label>
+                            <input type="time" name="time" class="form-control" required>
+                        </div>
+
+                        <!-- Designation Office -->
+                        <div class="col-md-4">
+                            <label class="required">Designation Office</label>
+                            <input type="text" name="designation_office" class="form-control" required>
+                        </div>
+
+                        <!-- Unit Shift -->
+                        <div class="col-md-4">
+                            <label>Unit Shift <span class="optional">(optional)</span></label>
+                            <input type="text" name="unit_shift" class="form-control">
+                        </div>
+
+                        <!-- Type of Incident -->
+                        <div class="col-md-3">
+                            <label for="type_of_incident" class="required">Type of Incident</label>
+                            <select name="type_of_incident" id="type_of_incident" class="form-control select2" required>
+                                <option value="">-- Select Incident Type --</option>
+                                @foreach($incident_types as $type)
+                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                @endforeach
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3" id="other_incident_div" style="display: none;">
+                            <label for="other_incident" class="required">Specify Other Incident</label>
+                            <input type="text" name="other_incident" id="other_incident" class="form-control">
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-6">
+                            <label>Description <span class="optional">(optional)</span></label>
+                            <textarea name="description" class="form-control"></textarea>
+                        </div>
+
+                        <!-- Enforcer + Police -->
+                        <div class="col-md-6">
+                            <label>Enforcer Name <span class="optional">(optional)</span></label>
+                            <input type="text" name="enforcer_name" class="form-control" placeholder="Enter Enforcer Name">
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <label class="me-3">Police Notified? <span class="optional">(optional)</span></label>
+                            <input type="checkbox" name="police_notified" value="1">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class='row'>
+                        <div class='col-md-6'>
+                             <div class='row'>
+                                <div class="col-md-6">
+                                    <label class="required">Province</label>
+                                    <input type="text" name="province" class="form-control" value="Metro Manila" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="required">City</label>
+                                    <input type="text" name="city" class="form-control" value="Mandaluyong" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="required">Barangay</label>
+                                    <select name="barangay_id" id="barangay" class="form-control select2" required>
+                                        <option value="">-- Select Barangay --</option>
+                                        @foreach($barangays as $b)
+                                            <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                 <div class="col-md-6">
+                                    <label class="required">Street</label>
+                                    <select name="street_id" id="street" class="form-control select2" required>
+                                        <option value="">-- Select Street --</option>
+                                        @foreach($streets as $s)
+                                            <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                 <div class="col-md-6">
+                                    <label class="required">Position</label>
+                                    <select name="street_position" id="street_position" class="form-control" required>
+                                        <option value="along">Along</option>
+                                        <option value="corner">Corner</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6" id="corner_street_div" style="display:none;">
+                                    <label class="required">Corner With</label>
+                                    <select name="corner_street_id" id="corner_street" class="form-control select2">
+                                        <option value="">-- Select Corner Street --</option>
+                                        @foreach($streets as $s)
+                                            <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                             </div>
+
+                             <div class='row'>
+                                <div class="col-md-6">
+                                    <label class="required">Latitude</label>
+                                    <input type="text" id="lat" name="lat" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="required">Longitude</label>
+                                    <input type="text" id="lng" name="lng" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label>Attachments <span class="optional">(optional)</span></label>
+                                    <input type="file" name="attachment[]" multiple class="form-control">
+                                </div>
+                                <div class="col-md-12">
+                                    <label>Remarks <span class="optional">(optional)</span></label>
+                                    <textarea name="remarks" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                         <div class='col-md-6'>
+                            <div class="col-md-12">
+                                <label>Location Map (Click to drop pin)</label>
+                                <div id="map"></div>
+                            </div>
+                         </div>
+                    </div>
+                    <hr>
+
+                    <!-- Persons Involved -->
+                    <h6>Persons Involved</h6>
+                    <div id="persons-wrapper">
+                        <div class="row g-3 person-item mb-2">
+                            <div class="col-md-3">
+                                <label class="required">Name</label>
+                                <input type="text" name="persons[0][name]" class="form-control" placeholder="Name" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="required">Address</label>
+                                <input type="text" name="persons[0][address]" class="form-control" placeholder="Address" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="required">Contact</label>
+                                <input type="text" name="persons[0][contact]" class="form-control" placeholder="Contact" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="required">Role</label>
+                                <select name="persons[0][is_main]" class="form-control" required>
+                                    <option value="1">Main</option>
+                                    <option value="0">Passenger</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+                    </div>
+                    <button type="button" id="add-person" class="btn btn-secondary btn-sm">+ Add Person</button>
+
+                    <hr>
+
+                    <button type="submit" class="btn btn-primary">Save Incident</button>
+                    <a href="{{ url('incidents') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+@section('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('.select2').select2();
+
+    let map = L.map('map').setView([14.5777316, 121.0331877], 18);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let marker;
+
+    function placeMarker(latlng) {
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker(latlng, { draggable: true }).addTo(map);
+
+        // update inputs
+        $('#lat').val(latlng.lat.toFixed(6));
+        $('#lng').val(latlng.lng.toFixed(6));
+
+        // when dragging ends, update lat/lng
+        marker.on('dragend', function(e) {
+            let pos = marker.getLatLng();
+            $('#lat').val(pos.lat.toFixed(6));
+            $('#lng').val(pos.lng.toFixed(6));
+            map.setView(pos);
+        });
+    }
+
+    // Map click
+    map.on('click', function(e) {
+        placeMarker(e.latlng);
+    });
+
+    // If Lat/Lng input changes, update marker on map
+    $('#lat, #lng').on('change keyup', function() {
+        let lat = parseFloat($('#lat').val());
+        let lng = parseFloat($('#lng').val());
+        if (!isNaN(lat) && !isNaN(lng)) {
+            let latlng = {lat: lat, lng: lng};
+            map.setView(latlng, 18);
+            placeMarker(latlng);
+        }
+    });
+
+    // Toggle corner field
+    $('#street_position').on('change', function() {
+        if ($(this).val() === 'corner') {
+            $('#corner_street_div').show();
+            $('#corner_street').attr('required', true);
+        } else {
+            $('#corner_street_div').hide();
+            $('#corner_street').removeAttr('required');
+        }
+    });
+
+    // Filter streets by barangay
+    $('#barangay').on('change', function () {
+        let barangayId = $(this).val();
+        $('#street option, #corner_street option').each(function () {
+            if (!$(this).val()) return;
+            $(this).toggle($(this).data('barangay') == barangayId);
+        });
+        $('#street, #corner_street').val('').trigger('change');
+    });
+
+    // Geocode with street + barangay
+    function geocodeAddress(query) {
+        $.get('https://nominatim.openstreetmap.org/search', {
+            q: query,
+            format: 'json',
+            addressdetails: 1,
+            limit: 1
+        }, function(data) {
+            if (data.length > 0) {
+                let latlng = {lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon)};
+                map.setView(latlng, 18);
+                placeMarker(latlng);
+            }
+        });
+    }
+
+    // On street / barangay / corner change
+    $('#street, #corner_street, #barangay').on('change', function() {
+        let barangayName = $("#barangay option:selected").text();
+        let streetName = $("#street option:selected").data('name');
+        let cornerName = $("#corner_street option:selected").data('name');
+        let city = "Mandaluyong, Metro Manila, Philippines";
+
+        if ($('#street_position').val() === 'corner' && streetName && cornerName && barangayName) {
+            geocodeAddress(`${streetName} & ${cornerName}, ${barangayName}, ${city}`);
+        } else if (streetName && barangayName) {
+            geocodeAddress(`${streetName}, ${barangayName}, ${city}`);
+        } else if (barangayName) {
+            geocodeAddress(`${barangayName}, ${city}`);
+        }
+    });
+
+    // Dynamic persons
+    let personIndex = 1;
+    $('#add-person').click(function () {
+        $('#persons-wrapper').append(`
+            <div class="row g-3 person-item mb-2">
+                <div class="col-md-3">
+                    <input type="text" name="persons[${personIndex}][name]" class="form-control" placeholder="Name">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="persons[${personIndex}][address]" class="form-control" placeholder="Address">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="persons[${personIndex}][contact]" class="form-control" placeholder="Contact">
+                </div>
+                <div class="col-md-2">
+                    <select name="persons[${personIndex}][is_main]" class="form-control">
+                        <option value="1">Main</option>
+                        <option value="0">Passenger</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger remove-person">X</button>
+                </div>
+            </div>
+        `);
+        personIndex++;
+    });
+
+    $(document).on('click', '.remove-person', function () {
+        $(this).closest('.person-item').remove();
+    });
+});
+</script>
+<script>
+$(document).ready(function() {
+    $('#type_of_incident').on('change', function() {
+        if ($(this).val() === 'others') {
+            $('#other_incident_div').show();
+            $('#other_incident').attr('required', true);
+        } else {
+            $('#other_incident_div').hide();
+            $('#other_incident').removeAttr('required');
+        }
+    });
+});
+</script>
+@endsection
+

@@ -20,4 +20,9 @@ class Barangay extends Model implements Auditable
         return $this->belongsTo(User::class, 'created_by', 'id'); 
     }
 
+    public function incidents()
+    {
+        return $this->hasMany(Incident::class);
+    }
+
 }
