@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Incident;
 use App\Barangay;
+use App\IncidentType;
 use App\Street;
 use Illuminate\Http\Request;
 
@@ -31,11 +32,15 @@ class IncidentController extends Controller
 
         $barangays = Barangay::get();
         $streets   = Street::get();
+        $incident_types   = IncidentType::get();
 
-        return view('incidents.index', compact('incidents', 'barangays', 'streets'));
+        return view('incidents.index', compact('incidents', 'barangays', 'streets','incident_types'));
     }
       public function create()
     {
-        return view('incidents.create');
+         $barangays = Barangay::get();
+        $streets   = Street::get();
+        $incident_types   = IncidentType::get();
+        return view('incidents.create', compact( 'barangays', 'streets','incident_types'));
     }
 }

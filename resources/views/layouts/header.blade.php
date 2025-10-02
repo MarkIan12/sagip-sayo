@@ -186,7 +186,7 @@
                         {{-- @endif --}}
                 
                     </ul>
-                    <div class="helpdesk-link-wrapper mt-auto">
+                    {{-- <div class="helpdesk-link-wrapper mt-auto">
                         <ul class="navbar-nav">
                             <li class="nav-item">
                                 <a class="nav-link menu-link bg-white" href="https://saltiii.freshdesk.com/support/home" target="_blank">
@@ -195,7 +195,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </div>
                 
                 <!-- Sidebar -->

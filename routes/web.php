@@ -18,5 +18,6 @@ Route::get('/','HomeController@index')->name('home');
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/incidents','IncidentController@index')->name('incidents');
+Route::get('/incidents/create','IncidentController@create')->name('incidents');
 
 });
