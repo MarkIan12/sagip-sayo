@@ -22,6 +22,8 @@
     <link href="{{asset('inside_css/assets/css/app.min.css')}}" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="{{asset('inside_css/assets/css/custom.min.css')}}" rel="stylesheet" type="text/css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
  
     {{-- <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css"> --}}
     @yield('css')
@@ -169,7 +171,7 @@
                         @if(auth()->user()->role == "Admin")
                             <li class="menu-title"><span data-key="t-menu">Admin</span></li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="{{url('/users')}}">
+                                <a class="nav-link menu-link" href="{{url('/streets')}}">
                                     <i class="ri-team-fill"></i> <span data-key="t-dashboards">Streets</span>
                                 </a>
                             </li>
@@ -179,8 +181,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="{{url('/categories')}}">
-                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Categories</span>
+                                <a class="nav-link menu-link" href="{{url('/incident_types')}}">
+                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Incident Types</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -227,13 +229,11 @@
             <div class="page-content">
                 <div class="container-fluid">
                         <div class="row">
-                            <div class="col-12">
+                            <!-- <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
                                     <h4 class="mb-sm-0">{{Route::current()->getName()}}</h4>
-        
-                                    
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         @yield('content')
                     </div>
@@ -285,6 +285,7 @@
     <script src="{{asset('inside_css/assets/libs/feather-icons/feather.min.js')}}"></script>
     <script src="{{asset('inside_css/assets/js/pages/plugins/lord-icon-2.1.0.js')}}"></script>
     <script src="{{asset('inside_css/assets/js/plugins.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- apexcharts -->
 

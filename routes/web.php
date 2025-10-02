@@ -35,13 +35,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('delete_barangay/{id}', 'BarangayController@destroy')->name('delete_barangay');
 
     // Streets
+    Route::get('/streets', 'StreetController@index')->name('streets');
+    Route::post('/new_street', 'StreetController@store')->name('streets.store');
+    Route::get('/edit/{id}', 'StreetController@edit');
+    // Route::post('update_incident_type/{id}', 'StreetController@update');
+    Route::post('delete_street/{id}', 'StreetController@destroy')->name('delete_street');
 
-    // Categories
-    Route::get('/categories', 'CategoryController@index')->name('categories');
-    Route::post('/new_category', 'CategoryController@store')->name('categories.store');
-    Route::get('/edit/{id}', 'CategoryController@edit');
-    Route::post('update_category/{id}', 'CategoryController@update');
-    Route::post('delete_category/{id}', 'CategoryController@destroy')->name('delete_category');
+    // Incident Type
+    Route::get('/incident_types', 'TypeController@index')->name('incident_types');
+    Route::post('/new_incident_type', 'TypeController@store')->name('incident_types.store');
+    Route::get('/edit/{id}', 'TypeController@edit');
+    Route::post('update_incident_type/{id}', 'TypeController@update');
+    Route::post('delete_incident_type/{id}', 'TypeController@destroy')->name('delete_category');
 
     // User
     Route::get('/users', 'UserController@index')->name('users');
