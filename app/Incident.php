@@ -42,4 +42,8 @@ class Incident extends Model implements Auditable
     {
         return $this->belongsTo(Street::class, 'corner_street_id', 'id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
 }

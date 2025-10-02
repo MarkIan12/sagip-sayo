@@ -51,39 +51,61 @@
                     <thead>
                         <tr>
                             <th>Date/Time</th>
-                            <th>Barangay</th>
-                            <th>Street</th>
+                            <th>Created By</th>
+                            <th>Address <br> Lat / Long</th>
                             <th>Type</th>
                             <th>Persons Involved</th>
+                            <th>Attachments</th>
+                            <th>Enforcer</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($incidents as $incident)
                             <tr>
                                 <td>{{ $incident->date }} {{ $incident->time }}</td>
-                                <td>{{ $incident->barangay->name }}</td>
-                                <td>{{ $incident->street->name }}</td>
-                                <td>{{ $incident->incident_types->name }}</td>
-                              
+                                <td>{{ $incident->user->name }}</td>
+                             
+                                <td>
+                                    {{ $incident->province }}, {{ $incident->city }},
+                                    {{ $incident->barangay->name ?? '' }},
+                                    {{ $incident->street->name ?? '' }}
+                                    @if($incident->street_position)
+                                        ({{ ucfirst($incident->street_position) }})
+                                    @endif
+                                    @if($incident->cornerStreet)
+                                        & {{ $incident->cornerStreet->name }}
+                                    @endif
+                                    <br>
+                                    <small>{{ $incident->lat }}, {{ $incident->lng }}</small>
+                                </td>
+                                   <td>{{ $incident->incident_types->name}}
+                                </td>
                                 <td>
                                     @foreach($incident->persons as $p)
                                         <div>{{ $p->name }} ({{ $p->is_main ? 'Main' : 'Passenger' }})</div>
                                     @endforeach
                                 </td>
+                                <td>
+                                    @foreach($incident->attachments as $a)
+                                        <div><a href="{{ asset($a->file_path) }}" target="_blank">{{ $a->file_name }}</a></div>
+                                    @endforeach
+                                </td>
+                                <td>{{$incident->enforcer_name}}</td>
+                                <td>
+                                   
+                                    <a href="{{ url('incidents/'.$incident->id.'/edit') }}" class="btn btn-warning btn-sm" title="Edit">
+                                        <i class="ri-pencil-fill"></i>
+                                    </a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">No incidents found</td>
+                                <td colspan="8" class="text-center">No incidents found</td>
                             </tr>
                         @endforelse
                     </tbody>
-                </table>
-
-                <!-- Pagination -->
-                <div class="d-flex justify-content-center">
-                    {{ $incidents->links() }}
-                </div>
-
+                </table> 
             </div>
         </div>
     </div>

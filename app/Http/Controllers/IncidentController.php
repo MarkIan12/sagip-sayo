@@ -92,6 +92,7 @@ class IncidentController extends Controller
             $new_incident->corner_street_id = $request->corner_street_id;
             $new_incident->lat = $request->lat;
             $new_incident->lng = $request->lng;
+            $new_incident->created_by = auth()->user()->id;
             $new_incident->remarks = $request->remarks;
             $new_incident->save();
 
@@ -135,6 +136,94 @@ class IncidentController extends Controller
             DB::rollback();
             // optional: delete any uploaded files if needed
             return redirect()->back()->withInput()->withErrors(['error' => 'Failed to save incident: ' . $e->getMessage()]);
+        }
+    }
+    public function edit($id)
+    {
+        $incident = Incident::with('persons', 'attachments')->findOrFail($id);
+        $barangays = Barangay::all();
+        $streets = Street::all();
+        $incident_types = IncidentType::all();
+        
+        return view('incidents.edit', compact('incident', 'barangays', 'streets', 'incident_types'));
+    }
+    public function update(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $incident = Incident::findOrFail($id);
+
+            // ✅ if type is "others", insert new type first
+            $incident_type_id = $request->type_of_incident;
+            if ($incident_type_id === "others") {
+                $new_type = new IncidentType;
+                $new_type->name = $request->other_incident;
+                $new_type->save();
+                $incident_type_id = $new_type->id;
+            }
+
+            // ✅ Update Incident
+            $incident->date = $request->date;
+            $incident->time = $request->time;
+            $incident->designation_office = $request->designation_office;
+            $incident->unit_shift = $request->unit_shift;
+            $incident->type_of_incident = $incident_type_id;
+            $incident->description = $request->description;
+            $incident->enforcer_name = $request->enforcer_name;
+            $incident->police_notified = $request->police_notified ? 1 : 0;
+            $incident->province = $request->province;
+            $incident->city = $request->city;
+            $incident->barangay_id = $request->barangay_id;
+            $incident->street_id = $request->street_id;
+            $incident->street_position = $request->street_position;
+            $incident->corner_street_id = $request->corner_street_id;
+            $incident->lat = $request->lat;
+            $incident->lng = $request->lng;
+            $incident->remarks = $request->remarks;
+            $incident->save();
+
+            // ✅ Update Persons: delete old and save new
+            $incident->persons()->delete();
+            if ($request->has('persons')) {
+                foreach ($request->persons as $person) {
+                    if (!empty($person['name'])) {
+                        $newPerson = new IncidentPerson;
+                        $newPerson->incident_id = $incident->id;
+                        $newPerson->name = $person['name'];
+                        $newPerson->address = $person['address'];
+                        $newPerson->contact = $person['contact'];
+                        $newPerson->is_main = $person['is_main'];
+                        $newPerson->save();
+                    }
+                }
+            }
+
+            // ✅ Add Attachments (keep old, add new)
+            if ($request->hasFile('attachment')) {
+                foreach ($request->file('attachment') as $file) {
+                    if ($file->isValid()) {
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('uploads/incidents'), $filename);
+
+                        $attachment = new IncidentAttachment;
+                        $attachment->incident_id = $incident->id;
+                        $attachment->file_path = 'uploads/incidents/' . $filename;
+                        $attachment->file_name = $file->getClientOriginalName();
+                        $attachment->save();
+                    }
+                }
+            }
+
+            DB::commit();
+
+            Alert::success('Successfully Updated')->persistent('Dismiss');
+            return redirect()->route('incidents.index')->with('success', 'Incident updated successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            // optional: delete any uploaded files if needed
+            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update incident: ' . $e->getMessage()]);
         }
     }
 }
