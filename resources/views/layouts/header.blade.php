@@ -104,7 +104,7 @@
                                 <!-- item-->
                                 <h6 class="dropdown-header">Welcome {{current(explode(' ',auth()->user()->name))}}!</h6>
                                 <a class="dropdown-item" href="{{url('/my-profile')}}" ><i class="mdi mdi-account-outline  text-muted fs-6 align-middle me-1"></i> <span class="align-middle">My Profile</span></a>
-                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editUserPassword"><i class="mdi mdi-key text-muted fs-6 align-middle me-1"></i> <span class="align-middle">Change Password</span></a>
+                                {{-- <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editUserPassword"><i class="mdi mdi-key text-muted fs-6 align-middle me-1"></i> <span class="align-middle">Change Password</span></a> --}}
                                 <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changeAvatar"><i class="mdi mdi-file-image text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Change Avatar</span></a>
                               <div class="dropdown-divider"></div>
                                 {{-- <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profile</span></a> --}}
@@ -166,18 +166,34 @@
                             </a>
                         </li>
                         
-                        {{-- @if(auth()->user()->role == "Admin") --}}
-                        <li class="menu-title"><span data-key="t-menu">Admin</span></li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="{{url('/users')}}">
-                                <i class="ri-team-fill"></i> <span data-key="t-dashboards">Users</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="{{url('/reports')}}">
-                                <i class="ri-file-list-3-fill"></i> <span data-key="t-dashboards">Reports</span>
-                            </a>
-                        </li>
+                        @if(auth()->user()->role == "Admin")
+                            <li class="menu-title"><span data-key="t-menu">Admin</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="{{url('/users')}}">
+                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Streets</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="{{url('/barangays')}}">
+                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Barangays</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="{{url('/categories')}}">
+                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Categories</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="{{url('/users')}}">
+                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Users</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="{{url('/reports')}}">
+                                    <i class="ri-file-list-3-fill"></i> <span data-key="t-dashboards">Reports</span>
+                                </a>
+                            </li>
+                        @endif
                         {{-- <li class="nav-item">
                             <a class="nav-link menu-link" href="https://api.saltiii.com/api/documentation" target="_blank">
                                 <i class="ri-shield-keyhole-line"></i> <span data-key="t-dashboards">API</span>
@@ -259,7 +275,7 @@
   
 
     <!-- Theme Settings -->
- @include('change_password')
+ @include('layouts.change_password')
  @include('change_avatar')
         @include('sweetalert::alert')
     <!-- JAVASCRIPT -->
