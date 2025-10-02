@@ -24,4 +24,7 @@ Route::post('/incidents/store','IncidentController@store')->name('incidents.stor
 Route::get('/incidents/{id}/edit','IncidentController@edit')->name('incidents.edit');
 Route::post('incidents/update/{id}','IncidentController@update')->name('incidents.update');
 
+
+Route::get('reports','IncidentReportController@index')->name('incidents.report');
+
 });

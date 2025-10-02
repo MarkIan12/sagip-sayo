@@ -30,6 +30,10 @@ class Incident extends Model implements Auditable
     {
         return $this->belongsTo(IncidentType::class, 'type_of_incident', 'id');
     }
+     public function type()
+    {
+        return $this->belongsTo(IncidentType::class, 'type_of_incident', 'id');
+    }
 
     // Street
     public function street()
