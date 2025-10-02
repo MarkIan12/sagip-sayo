@@ -3,8 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
-class Street extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class Street extends Model implements Auditable
 {
     //
+    use \OwenIt\Auditing\Auditable;
 }

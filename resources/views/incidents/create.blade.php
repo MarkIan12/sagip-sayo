@@ -10,6 +10,16 @@
         border: 1px solid #ddd;
         margin-top: 10px;
     }
+    .required::after {
+        content: " *";
+        color: red;
+    }
+    .optional {
+        font-style: italic;
+        font-size: 0.9em;
+        color: #666;
+        margin-left: 5px;
+    }
 </style>
 @endsection
 
@@ -30,59 +40,55 @@
                     <div class="row g-3">
                         <!-- Date/Time -->
                         <div class="col-md-2">
-                            <label>Date & Time</label>
+                            <label class="required">Date</label>
                             <input type="date" name="date" class="form-control" required>
                         </div>
                         <div class="col-md-2">
-                            <label>Time</label>
+                            <label class="required">Time</label>
                             <input type="time" name="time" class="form-control" required>
                         </div>
 
                         <!-- Designation Office -->
                         <div class="col-md-4">
-                            <label>Designation Office</label>
+                            <label class="required">Designation Office</label>
                             <input type="text" name="designation_office" class="form-control" required>
                         </div>
 
                         <!-- Unit Shift -->
                         <div class="col-md-4">
-                            <label>Unit Shift</label>
+                            <label>Unit Shift <span class="optional">(optional)</span></label>
                             <input type="text" name="unit_shift" class="form-control">
                         </div>
 
                         <!-- Type of Incident -->
                         <div class="col-md-3">
-                           <div class="mb-3">
-                                <label for="type_of_incident" class="form-label">Type of Incident</label>
-                                <select name="type_of_incident" id="type_of_incident" class="form-control select2" required>
-                                    <option value="">-- Select Incident Type --</option>
-                                    @foreach($incident_types as $type)
-                                        <option value="{{ $type }}">{{ $type }}</option>
-                                    @endforeach
-                                    <option value="others">Others</option>
-                                </select>
-                            </div>
+                            <label for="type_of_incident" class="required">Type of Incident</label>
+                            <select name="type_of_incident" id="type_of_incident" class="form-control select2" required>
+                                <option value="">-- Select Incident Type --</option>
+                                @foreach($incident_types as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @endforeach
+                                <option value="others">Others</option>
+                            </select>
                         </div>
-                        <div class="col-md-3">
-                                <div class="mb-3" id="other_incident_div" style="display: none;">
-                                    <label for="other_incident" class="form-label">Specify Other Incident</label>
-                                    <input type="text" name="other_incident" id="other_incident" class="form-control">
-                                </div>
+                        <div class="col-md-3" id="other_incident_div" style="display: none;">
+                            <label for="other_incident" class="required">Specify Other Incident</label>
+                            <input type="text" name="other_incident" id="other_incident" class="form-control">
                         </div>
 
                         <!-- Description -->
                         <div class="col-md-6">
-                            <label>Description</label>
+                            <label>Description <span class="optional">(optional)</span></label>
                             <textarea name="description" class="form-control"></textarea>
                         </div>
 
                         <!-- Enforcer + Police -->
                         <div class="col-md-6">
-                            <label>Enforcer Name</label>
+                            <label>Enforcer Name <span class="optional">(optional)</span></label>
                             <input type="text" name="enforcer_name" class="form-control" placeholder="Enter Enforcer Name">
                         </div>
                         <div class="col-md-6 d-flex align-items-center">
-                            <label class="me-3">Police Notified?</label>
+                            <label class="me-3">Police Notified? <span class="optional">(optional)</span></label>
                             <input type="checkbox" name="police_notified" value="1">
                         </div>
                     </div>
@@ -91,15 +97,15 @@
                         <div class='col-md-6'>
                              <div class='row'>
                                 <div class="col-md-6">
-                                    <label>Province</label>
+                                    <label class="required">Province</label>
                                     <input type="text" name="province" class="form-control" value="Metro Manila" readonly>
                                 </div>
-                                <div  class="col-md-6">
-                                    <label>City</label>
+                                <div class="col-md-6">
+                                    <label class="required">City</label>
                                     <input type="text" name="city" class="form-control" value="Mandaluyong" readonly>
                                 </div>
                                 <div class="col-md-6">
-                                    <label>Barangay</label>
+                                    <label class="required">Barangay</label>
                                     <select name="barangay_id" id="barangay" class="form-control select2" required>
                                         <option value="">-- Select Barangay --</option>
                                         @foreach($barangays as $b)
@@ -108,7 +114,7 @@
                                     </select>
                                 </div>
                                  <div class="col-md-6">
-                                    <label>Street</label>
+                                    <label class="required">Street</label>
                                     <select name="street_id" id="street" class="form-control select2" required>
                                         <option value="">-- Select Street --</option>
                                         @foreach($streets as $s)
@@ -117,14 +123,14 @@
                                     </select>
                                 </div>
                                  <div class="col-md-6">
-                                    <label>Position</label>
+                                    <label class="required">Position</label>
                                     <select name="street_position" id="street_position" class="form-control" required>
                                         <option value="along">Along</option>
                                         <option value="corner">Corner</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6" id="corner_street_div" style="display:none;">
-                                    <label>Corner With</label>
+                                    <label class="required">Corner With</label>
                                     <select name="corner_street_id" id="corner_street" class="form-control select2">
                                         <option value="">-- Select Corner Street --</option>
                                         @foreach($streets as $s)
@@ -132,45 +138,35 @@
                                         @endforeach
                                     </select>
                                 </div>
-
                              </div>
-                               <div class='row'>
+
+                             <div class='row'>
                                 <div class="col-md-6">
-                                    <label>Latitude</label>
+                                    <label class="required">Latitude</label>
                                     <input type="text" id="lat" name="lat" class="form-control" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label>Longitude</label>
+                                    <label class="required">Longitude</label>
                                     <input type="text" id="lng" name="lng" class="form-control" required>
                                 </div>
 
-                                <!-- Remarks -->
                                 <div class="col-md-12">
-                                    <label>Attachments</label>
+                                    <label>Attachments <span class="optional">(optional)</span></label>
                                     <input type="file" name="attachment[]" multiple class="form-control">
                                 </div>
                                 <div class="col-md-12">
-                                    <label>Remarks</label>
+                                    <label>Remarks <span class="optional">(optional)</span></label>
                                     <textarea name="remarks" class="form-control"></textarea>
                                 </div>
-
-                                <!-- Attachment -->
-                            
                             </div>
                         </div>
                          <div class='col-md-6'>
-                             <div class='row'>
-                                <div class="col-md-12">
-                                    <label>Location Map (Click to drop pin)</label>
-                                    <div id="map"></div>
-                                </div>
-                                 
-                             </div>
-
+                            <div class="col-md-12">
+                                <label>Location Map (Click to drop pin)</label>
+                                <div id="map"></div>
+                            </div>
                          </div>
                     </div>
-                  
-
                     <hr>
 
                     <!-- Persons Involved -->
@@ -178,16 +174,20 @@
                     <div id="persons-wrapper">
                         <div class="row g-3 person-item mb-2">
                             <div class="col-md-3">
-                                <input type="text" name="persons[0][name]" class="form-control" placeholder="Name">
+                                <label class="required">Name</label>
+                                <input type="text" name="persons[0][name]" class="form-control" placeholder="Name" required>
                             </div>
                             <div class="col-md-3">
-                                <input type="text" name="persons[0][address]" class="form-control" placeholder="Address">
+                                <label class="required">Address</label>
+                                <input type="text" name="persons[0][address]" class="form-control" placeholder="Address" required>
                             </div>
                             <div class="col-md-2">
-                                <input type="text" name="persons[0][contact]" class="form-control" placeholder="Contact">
+                                <label class="required">Contact</label>
+                                <input type="text" name="persons[0][contact]" class="form-control" placeholder="Contact" required>
                             </div>
                             <div class="col-md-2">
-                                <select name="persons[0][is_main]" class="form-control">
+                                <label class="required">Role</label>
+                                <select name="persons[0][is_main]" class="form-control" required>
                                     <option value="1">Main</option>
                                     <option value="0">Passenger</option>
                                 </select>
@@ -216,7 +216,7 @@
 $(document).ready(function() {
     $('.select2').select2();
 
-    let map = L.map('map').setView([14.5836, 121.0409], 14);
+    let map = L.map('map').setView([14.5777316, 121.0331877], 18);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
     }).addTo(map);

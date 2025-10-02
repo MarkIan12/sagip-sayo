@@ -54,18 +54,17 @@
                             <th>Barangay</th>
                             <th>Street</th>
                             <th>Type</th>
-                            <th>Description</th>
                             <th>Persons Involved</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($incidents as $incident)
                             <tr>
-                                <td>{{ $incident->date_time }}</td>
-                                <td>{{ $incident->barangay }}</td>
-                                <td>{{ $incident->street }}</td>
-                                <td>{{ $incident->type_of_incident }}</td>
-                                <td>{{ Str::limit($incident->description, 50) }}</td>
+                                <td>{{ $incident->date }} {{ $incident->time }}</td>
+                                <td>{{ $incident->barangay->name }}</td>
+                                <td>{{ $incident->street->name }}</td>
+                                <td>{{ $incident->incident_types->name }}</td>
+                              
                                 <td>
                                     @foreach($incident->persons as $p)
                                         <div>{{ $p->name }} ({{ $p->is_main ? 'Main' : 'Passenger' }})</div>
