@@ -29,9 +29,13 @@
 
                     <div class="row g-3">
                         <!-- Date/Time -->
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label>Date & Time</label>
-                            <input type="datetime-local" name="date_time" class="form-control" required>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Time</label>
+                            <input type="time" name="time" class="form-control" required>
                         </div>
 
                         <!-- Designation Office -->
@@ -47,9 +51,23 @@
                         </div>
 
                         <!-- Type of Incident -->
-                        <div class="col-md-6">
-                            <label>Type of Incident</label>
-                            <input type="text" name="type_of_incident" class="form-control" required>
+                        <div class="col-md-3">
+                           <div class="mb-3">
+                                <label for="type_of_incident" class="form-label">Type of Incident</label>
+                                <select name="type_of_incident" id="type_of_incident" class="form-control select2" required>
+                                    <option value="">-- Select Incident Type --</option>
+                                    @foreach($incident_types as $type)
+                                        <option value="{{ $type }}">{{ $type }}</option>
+                                    @endforeach
+                                    <option value="others">Others</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                                <div class="mb-3" id="other_incident_div" style="display: none;">
+                                    <label for="other_incident" class="form-label">Specify Other Incident</label>
+                                    <input type="text" name="other_incident" id="other_incident" class="form-control">
+                                </div>
                         </div>
 
                         <!-- Description -->
@@ -67,89 +85,91 @@
                             <label class="me-3">Police Notified?</label>
                             <input type="checkbox" name="police_notified" value="1">
                         </div>
-
-                        <!-- Province -->
-                        <div class="col-md-3">
-                            <label>Province</label>
-                            <input type="text" name="province" class="form-control" value="Metro Manila" readonly>
-                        </div>
-
-                        <!-- City -->
-                        <div class="col-md-3">
-                            <label>City</label>
-                            <input type="text" name="city" class="form-control" value="Mandaluyong" readonly>
-                        </div>
-
-                        <!-- Barangay -->
-                        <div class="col-md-3">
-                            <label>Barangay</label>
-                            <select name="barangay_id" id="barangay" class="form-control select2" required>
-                                <option value="">-- Select Barangay --</option>
-                                @foreach($barangays as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Position (Along/Corner) -->
-                        <div class="col-md-3">
-                            <label>Position</label>
-                            <select name="street_position" id="street_position" class="form-control" required>
-                                <option value="along">Along</option>
-                                <option value="corner">Corner</option>
-                            </select>
-                        </div>
-
-                        <!-- Main Street -->
-                        <div class="col-md-3">
-                            <label>Street</label>
-                            <select name="street_id" id="street" class="form-control select2" required>
-                                <option value="">-- Select Street --</option>
-                                @foreach($streets as $s)
-                                    <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Corner Street -->
-                        <div class="col-md-3" id="corner_street_div" style="display:none;">
-                            <label>Corner With</label>
-                            <select name="corner_street_id" id="corner_street" class="form-control select2">
-                                <option value="">-- Select Corner Street --</option>
-                                @foreach($streets as $s)
-                                    <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Map -->
-                        <div class="col-md-12">
-                            <label>Location Map (Click to drop pin)</label>
-                            <div id="map"></div>
-                        </div>
-
-                        <!-- Lat & Lng -->
-                        <div class="col-md-3">
-                            <label>Latitude</label>
-                            <input type="text" id="lat" name="lat" class="form-control" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Longitude</label>
-                            <input type="text" id="lng" name="lng" class="form-control" readonly>
-                        </div>
-
-                        <!-- Remarks -->
-                        <div class="col-md-6">
-                            <label>Remarks</label>
-                            <textarea name="remarks" class="form-control"></textarea>
-                        </div>
-
-                        <!-- Attachment -->
-                        <div class="col-md-6">
-                            <label>Attachment</label>
-                            <input type="file" name="attachment" class="form-control">
-                        </div>
                     </div>
+                    <hr>
+                    <div class='row'>
+                        <div class='col-md-6'>
+                             <div class='row'>
+                                <div class="col-md-6">
+                                    <label>Province</label>
+                                    <input type="text" name="province" class="form-control" value="Metro Manila" readonly>
+                                </div>
+                                <div  class="col-md-6">
+                                    <label>City</label>
+                                    <input type="text" name="city" class="form-control" value="Mandaluyong" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Barangay</label>
+                                    <select name="barangay_id" id="barangay" class="form-control select2" required>
+                                        <option value="">-- Select Barangay --</option>
+                                        @foreach($barangays as $b)
+                                            <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                 <div class="col-md-6">
+                                    <label>Street</label>
+                                    <select name="street_id" id="street" class="form-control select2" required>
+                                        <option value="">-- Select Street --</option>
+                                        @foreach($streets as $s)
+                                            <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                 <div class="col-md-6">
+                                    <label>Position</label>
+                                    <select name="street_position" id="street_position" class="form-control" required>
+                                        <option value="along">Along</option>
+                                        <option value="corner">Corner</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6" id="corner_street_div" style="display:none;">
+                                    <label>Corner With</label>
+                                    <select name="corner_street_id" id="corner_street" class="form-control select2">
+                                        <option value="">-- Select Corner Street --</option>
+                                        @foreach($streets as $s)
+                                            <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                             </div>
+                               <div class='row'>
+                                <div class="col-md-6">
+                                    <label>Latitude</label>
+                                    <input type="text" id="lat" name="lat" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Longitude</label>
+                                    <input type="text" id="lng" name="lng" class="form-control" required>
+                                </div>
+
+                                <!-- Remarks -->
+                                <div class="col-md-12">
+                                    <label>Attachments</label>
+                                    <input type="file" name="attachment[]" multiple class="form-control">
+                                </div>
+                                <div class="col-md-12">
+                                    <label>Remarks</label>
+                                    <textarea name="remarks" class="form-control"></textarea>
+                                </div>
+
+                                <!-- Attachment -->
+                            
+                            </div>
+                        </div>
+                         <div class='col-md-6'>
+                             <div class='row'>
+                                <div class="col-md-12">
+                                    <label>Location Map (Click to drop pin)</label>
+                                    <div id="map"></div>
+                                </div>
+                                 
+                             </div>
+
+                         </div>
+                    </div>
+                  
 
                     <hr>
 
@@ -172,9 +192,7 @@
                                     <option value="0">Passenger</option>
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-danger remove-person">X</button>
-                            </div>
+                            <div class="col-md-2"></div>
                         </div>
                     </div>
                     <button type="button" id="add-person" class="btn btn-secondary btn-sm">+ Add Person</button>
@@ -189,7 +207,6 @@
     </div>
 </div>
 @endsection
-
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -207,15 +224,38 @@ $(document).ready(function() {
     let marker;
 
     function placeMarker(latlng) {
-        if (marker) map.removeLayer(marker);
-        marker = L.marker(latlng).addTo(map);
-        $('#lat').val(latlng.lat);
-        $('#lng').val(latlng.lng);
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker(latlng, { draggable: true }).addTo(map);
+
+        // update inputs
+        $('#lat').val(latlng.lat.toFixed(6));
+        $('#lng').val(latlng.lng.toFixed(6));
+
+        // when dragging ends, update lat/lng
+        marker.on('dragend', function(e) {
+            let pos = marker.getLatLng();
+            $('#lat').val(pos.lat.toFixed(6));
+            $('#lng').val(pos.lng.toFixed(6));
+            map.setView(pos);
+        });
     }
 
     // Map click
     map.on('click', function(e) {
         placeMarker(e.latlng);
+    });
+
+    // If Lat/Lng input changes, update marker on map
+    $('#lat, #lng').on('change keyup', function() {
+        let lat = parseFloat($('#lat').val());
+        let lng = parseFloat($('#lng').val());
+        if (!isNaN(lat) && !isNaN(lng)) {
+            let latlng = {lat: lat, lng: lng};
+            map.setView(latlng, 18);
+            placeMarker(latlng);
+        }
     });
 
     // Toggle corner field
@@ -304,4 +344,18 @@ $(document).ready(function() {
     });
 });
 </script>
+<script>
+$(document).ready(function() {
+    $('#type_of_incident').on('change', function() {
+        if ($(this).val() === 'others') {
+            $('#other_incident_div').show();
+            $('#other_incident').attr('required', true);
+        } else {
+            $('#other_incident_div').hide();
+            $('#other_incident').removeAttr('required');
+        }
+    });
+});
+</script>
 @endsection
+
