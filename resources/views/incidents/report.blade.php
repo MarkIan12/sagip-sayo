@@ -220,12 +220,12 @@
     // Map
     var map = L.map('map').setView([14.5777316, 121.0331877], 15); // default center
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+        attribution: '© RushPoint'
     }).addTo(map);
 
     @foreach($incidents as $i)
-        @if($i->latitude && $i->longitude)
-            L.marker([{{ $i->latitude }}, {{ $i->longitude }}]).addTo(map)
+        @if($i->lat && $i->lng)
+            L.marker([{{ $i->lat }}, {{ $i->lng }}]).addTo(map)
                 .bindPopup('<b>{{ $i->typeOfIncident->name ?? 'N/A' }}</b><br>{{ $i->barangay->name ?? '' }}, {{ $i->street->name ?? '' }}<br>{{ $i->date }}');
         @endif
     @endforeach

@@ -66,7 +66,7 @@
                             <select name="type_of_incident" id="type_of_incident" class="form-control select2" required>
                                 <option value="">-- Select Incident Type --</option>
                                 @foreach($incident_types as $type)
-                                    <option value="{{ $type }}">{{ $type }}</option>
+                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                                 <option value="others">Others</option>
                             </select>
