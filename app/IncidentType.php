@@ -8,4 +8,8 @@ class IncidentType extends Model implements Auditable
 {
     //
     use \OwenIt\Auditing\Auditable;
+    public function incidents()
+    {
+        return $this->hasMany(Incident::class,'type_of_incident','id');
+    }
 }

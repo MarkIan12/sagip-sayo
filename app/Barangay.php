@@ -8,5 +8,8 @@ class Barangay extends Model implements Auditable
 {
      use \OwenIt\Auditing\Auditable;
     //
-    
+    public function incidents()
+    {
+        return $this->hasMany(Incident::class);
+    }
 }
