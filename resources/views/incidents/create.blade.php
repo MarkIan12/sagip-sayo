@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <style>
     #map {
         height: 300px;
@@ -90,11 +91,31 @@
                             </select>
                         </div>
 
-                        <!-- Street -->
+                        <!-- Position (Along/Corner) -->
+                        <div class="col-md-3">
+                            <label>Position</label>
+                            <select name="street_position" id="street_position" class="form-control" required>
+                                <option value="along">Along</option>
+                                <option value="corner">Corner</option>
+                            </select>
+                        </div>
+
+                        <!-- Main Street -->
                         <div class="col-md-3">
                             <label>Street</label>
                             <select name="street_id" id="street" class="form-control select2" required>
                                 <option value="">-- Select Street --</option>
+                                @foreach($streets as $s)
+                                    <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Corner Street -->
+                        <div class="col-md-3" id="corner_street_div" style="display:none;">
+                            <label>Corner With</label>
+                            <select name="corner_street_id" id="corner_street" class="form-control select2">
+                                <option value="">-- Select Corner Street --</option>
                                 @foreach($streets as $s)
                                     <option value="{{ $s->id }}" data-barangay="{{ $s->barangay_id }}" data-name="{{ $s->name }}">{{ $s->name }}</option>
                                 @endforeach
@@ -172,69 +193,85 @@
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXeIzjHN5haDfX4BckC7u-jzc8fok1MtA"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
 $(document).ready(function() {
     $('.select2').select2();
 
-    let map, marker, geocoder;
-    function initMap() {
-        geocoder = new google.maps.Geocoder();
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: 14.5836, lng: 121.0409 },
-            zoom: 14
-        });
+    let map = L.map('map').setView([14.5836, 121.0409], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-        map.addListener("click", (e) => {
-            placeMarker(e.latLng);
-        });
+    let marker;
+
+    function placeMarker(latlng) {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(latlng).addTo(map);
+        $('#lat').val(latlng.lat);
+        $('#lng').val(latlng.lng);
     }
 
-    function placeMarker(location) {
-        if (marker) marker.setMap(null);
-        marker = new google.maps.Marker({
-            position: location,
-            map: map
-        });
-        $('#lat').val(location.lat());
-        $('#lng').val(location.lng());
-    }
-
-    initMap();
-
-    // filter streets by barangay
-    $('#barangay').on('change', function () {
-        let barangayId = $(this).val();
-        $('#street option').each(function () {
-            if (!$(this).val()) return;
-            $(this).toggle($(this).data('barangay') == barangayId);
-        });
-        $('#street').val('').trigger('change');
+    // Map click
+    map.on('click', function(e) {
+        placeMarker(e.latlng);
     });
 
-    // when street is selected, focus map
-    $('#street').on('change', function () {
-        let streetName = $("#street option:selected").data('name');
-        let barangayName = $("#barangay option:selected").text();
-        let city = "Mandaluyong, Metro Manila, Philippines";
-
-        if (streetName && barangayName) {
-            let fullAddress = streetName + ", " + barangayName + ", " + city;
-
-            geocoder.geocode({ 'address': fullAddress }, function(results, status) {
-                if (status === 'OK') {
-                    map.setCenter(results[0].geometry.location);
-                    map.setZoom(18);
-                    placeMarker(results[0].geometry.location);
-                } else {
-                    alert('Geocode failed: ' + status);
-                }
-            });
+    // Toggle corner field
+    $('#street_position').on('change', function() {
+        if ($(this).val() === 'corner') {
+            $('#corner_street_div').show();
+            $('#corner_street').attr('required', true);
+        } else {
+            $('#corner_street_div').hide();
+            $('#corner_street').removeAttr('required');
         }
     });
 
-    // dynamic persons
+    // Filter streets by barangay
+    $('#barangay').on('change', function () {
+        let barangayId = $(this).val();
+        $('#street option, #corner_street option').each(function () {
+            if (!$(this).val()) return;
+            $(this).toggle($(this).data('barangay') == barangayId);
+        });
+        $('#street, #corner_street').val('').trigger('change');
+    });
+
+    // Geocode with street + barangay
+    function geocodeAddress(query) {
+        $.get('https://nominatim.openstreetmap.org/search', {
+            q: query,
+            format: 'json',
+            addressdetails: 1,
+            limit: 1
+        }, function(data) {
+            if (data.length > 0) {
+                let latlng = {lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon)};
+                map.setView(latlng, 18);
+                placeMarker(latlng);
+            }
+        });
+    }
+
+    // On street / barangay / corner change
+    $('#street, #corner_street, #barangay').on('change', function() {
+        let barangayName = $("#barangay option:selected").text();
+        let streetName = $("#street option:selected").data('name');
+        let cornerName = $("#corner_street option:selected").data('name');
+        let city = "Mandaluyong, Metro Manila, Philippines";
+
+        if ($('#street_position').val() === 'corner' && streetName && cornerName && barangayName) {
+            geocodeAddress(`${streetName} & ${cornerName}, ${barangayName}, ${city}`);
+        } else if (streetName && barangayName) {
+            geocodeAddress(`${streetName}, ${barangayName}, ${city}`);
+        } else if (barangayName) {
+            geocodeAddress(`${barangayName}, ${city}`);
+        }
+    });
+
+    // Dynamic persons
     let personIndex = 1;
     $('#add-person').click(function () {
         $('#persons-wrapper').append(`
