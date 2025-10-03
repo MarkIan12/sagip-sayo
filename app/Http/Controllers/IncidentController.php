@@ -10,6 +10,7 @@ use App\Street;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 
 class IncidentController extends Controller
 {
@@ -226,4 +227,51 @@ class IncidentController extends Controller
             return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update incident: ' . $e->getMessage()]);
         }
     }
+    public function map()
+    {
+         $barangays = Barangay::all();
+        return view('incidents.map', compact('barangays'));
+    }
+
+     public function getStreets($barangayId)
+    {
+        $streets = Street::where('barangay_id', $barangayId)->get();
+        return response()->json($streets);
+    }
+
+   public function incidents()
+    {
+        $apiKey = env('TOMTOM_API_KEY');
+
+        // Mandaluyong bbox
+        $bbox = "121.0,14.55,121.07,14.61";
+
+        $client = new Client();
+        $url = "https://api.tomtom.com/traffic/services/5/incidentDetails";
+
+        try {
+            $fields = '{incidents{type,geometry{type,coordinates},properties{id,iconCategory,magnitudeOfDelay,events{description,code,iconCategory},startTime,endTime,from,to,length,delay,roadNumbers,timeValidity,probabilityOfOccurrence,numberOfReports,lastReportTime,tmc{countryCode,tableNumber,tableVersion,direction,points{location,offset}}}}}';
+
+            $response = $client->get("https://api.tomtom.com/traffic/services/5/incidentDetails", [
+                    'query' => [
+                        'key' => $apiKey,
+                        'bbox' => $bbox, // e.g. "121.0,14.55,121.07,14.61"
+                        'fields' => '{incidents{type,geometry{type,coordinates},properties{iconCategory,events{description,code,iconCategory},roadNumbers,magnitudeOfDelay}}}',
+                        'language' => 'en-GB',
+                        't' => 1111,
+                        'timeValidityFilter' => 'present',
+                        // 'categoryFilter' => '6',
+                        
+                    ]
+                ]);
+            $data = json_decode($response->getBody(), true);
+            return response()->json($data);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
 }

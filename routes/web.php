@@ -24,6 +24,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/incidents/{id}/edit','IncidentController@edit')->name('incidents.edit');
     Route::post('incidents/update/{id}','IncidentController@update')->name('incidents.update');
 
+    Route::get('/traffic-map','IncidentController@map')->name('incidents.map');
+    Route::get('/traffic-map/streets/{barangay}', 'IncidentController@getStreets')->name('incidents.streets');
+    Route::get('/traffic-incidents', 'IncidentController@incidents')->name('traffic.incidents');
 
     Route::get('reports','IncidentReportController@index')->name('incidents.report');
 

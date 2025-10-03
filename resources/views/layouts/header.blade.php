@@ -167,6 +167,11 @@
                                 <i class="ri-list-check"></i> <span data-key="t-dashboards">Incidents</span>
                             </a>
                         </li>
+                       <li class="nav-item">
+                            <a class="nav-link menu-link" href="{{ url('/traffic-map') }}">
+                                <i class="ri-map-pin-2-line"></i> <span data-key="t-maps">Traffic Map</span>
+                            </a>
+                        </li>
                         
                         @if(auth()->user()->role == "Admin")
                             <li class="menu-title"><span data-key="t-menu">Admin</span></li>
