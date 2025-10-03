@@ -37,7 +37,14 @@ const categoryIcons = {
     11:{color: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", label: "Flooding"},
     14:{color: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", label: "Broken Down Vehicle"}
 };
-
+// Map TomTom magnitudeOfDelay → description
+const delayLevels = {
+    0: "Unknown",
+    1: "Minor",
+    2: "Moderate",
+    3: "Major",
+    4: "Undefined"
+};
 function initMap() {
     const mandaluyong = { lat: 14.5771621, lng: 121.0346741 };
 
@@ -96,7 +103,7 @@ function initMap() {
                                 <strong>Category:</strong> ${categoryIcons[iconCategory].label} <br>
                                 <strong>Description:</strong> ${description} <br>
                                 <strong>Road:</strong> ${incident.properties.roadNumbers || 'Unknown'} <br>
-                                <strong>Delay:</strong> ${incident.properties.magnitudeOfDelay || 'N/A'}
+                                <strong>Delay:</strong> ${delayLevels[incident.properties.magnitudeOfDelay] || 'Unknown'}
                             `
                         });
 
