@@ -99,9 +99,9 @@
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
                                 <h6 class="dropdown-header">Welcome {{current(explode(' ',auth()->user()->name))}}!</h6>
-                                <a class="dropdown-item" href="{{url('/my-profile')}}" ><i class="mdi mdi-account-outline  text-muted fs-6 align-middle me-1"></i> <span class="align-middle">My Profile</span></a>
+                                {{-- <a class="dropdown-item" href="{{url('/my-profile')}}" ><i class="mdi mdi-account-outline  text-muted fs-6 align-middle me-1"></i> <span class="align-middle">My Profile</span></a> --}}
                                 {{-- <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editUserPassword"><i class="mdi mdi-key text-muted fs-6 align-middle me-1"></i> <span class="align-middle">Change Password</span></a> --}}
-                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changeAvatar"><i class="mdi mdi-file-image text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Change Avatar</span></a>
+                                {{-- <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changeAvatar"><i class="mdi mdi-file-image text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Change Avatar</span></a> --}}
                               <div class="dropdown-divider"></div>
                                 {{-- <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profile</span></a> --}}
                               <div class="dropdown-divider"></div>
@@ -159,6 +159,11 @@
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="{{url('/incidents')}}">
                                 <i class="ri-list-check"></i> <span data-key="t-dashboards">Incidents</span>
+                            </a>
+                        </li>
+                       <li class="nav-item">
+                            <a class="nav-link menu-link" href="{{ url('/traffic-map') }}">
+                                <i class="ri-map-pin-2-line"></i> <span data-key="t-maps">Traffic Map</span>
                             </a>
                         </li>
                         
