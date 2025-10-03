@@ -7,11 +7,11 @@
     {{-- @laravelPWA --}}
     <!-- CSRF Token -->
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Sagip') }}</title>
     <link rel="shortcut icon" href="{{url('images/Favicon.png')}}">
     <link rel="icon" href="{{url('images/Favicon.png')}}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Sagip') }}</title>
 
     <!-- Layout config Js -->
     <script src="{{asset('inside_css/assets/js/layout.js')}}"></script>
@@ -69,7 +69,7 @@
                         <div class="text-center mt-sm-5 mb-4 text-white-50">
                             <div>
                                 <a href="{{url('/')}}" class="d-inline-block auth-logo">
-                                    <img src="{{asset('images/Muntinlupa_City.png')}}" alt="" height="100">
+                                    <img src="{{asset('images/manda.png')}}" alt="" height="100">
                                 </a>
                             </div>
                             {{-- <p class="mt-3 fs-15 fw-medium">3 in 1 solution</p> --}}

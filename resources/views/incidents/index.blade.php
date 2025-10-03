@@ -10,14 +10,30 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <!-- <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Incidents <a href='{{url('incidents/create')}}'><button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addActivity">
                             <i class="ri-add-line align-bottom"></i>
                         </button></a></h5>
               
-            </div>
+            </div> -->
 
             <div class="card-body">
+                <h4 class="card-title d-flex justify-content-between mb-3">
+                    Incidents List
+                    <a href='{{url('incidents/create')}}'><button class="btn btn-md btn-primary" data-bs-toggle="modal" data-bs-target="#addActivity">Add Incident</button></a>
+                </h4>
+                <div class="col-md-6 offset-md-6">
+                    <form method="GET" action="{{ route('streets') }}" class="custom_form mb-3" enctype="multipart/form-data" onsubmit="show()">
+                        <div class="row height d-flex justify-content-end align-items-end">
+                            <div class="col-md-9">
+                                <div class="search">
+                                    <input type="text" class="form-control" placeholder="Search Streets" name="search" value="{{ request('search') }}"> 
+                                    <button class="btn btn-sm btn-primary">Search</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
                 <!-- Filters -->
                 <form method="GET" action="{{ url('incidents') }}" class="row g-3 mb-3 ">
@@ -47,9 +63,10 @@
                 </form>
 
                 <!-- Table -->
-                <table class="table table-bordered table-striped align-middle">
+                <table class="table table-responsive align-middle">
                     <thead>
                         <tr>
+                            <th>Action</th>
                             <th>Date/Time</th>
                             <th>Created By</th>
                             <th>Address <br> Lat / Long</th>
@@ -57,12 +74,17 @@
                             <th>Persons Involved</th>
                             <th>Attachments</th>
                             <th>Enforcer</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($incidents as $incident)
                             <tr>
+                                <td>
+                                   
+                                    <a href="{{ url('incidents/'.$incident->id.'/edit') }}" class="btn btn btn-outline-info btn-sm" title="Edit Incident">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </a>
+                                </td>
                                 <td>{{ $incident->date }} {{ $incident->time }}</td>
                                 <td>{{ $incident->user->name }}</td>
                              
@@ -92,12 +114,6 @@
                                     @endforeach
                                 </td>
                                 <td>{{$incident->enforcer_name}}</td>
-                                <td>
-                                   
-                                    <a href="{{ url('incidents/'.$incident->id.'/edit') }}" class="btn btn-warning btn-sm" title="Edit">
-                                        <i class="ri-pencil-fill"></i>
-                                    </a>
-                                </td>
                             </tr>
                         @empty
                             <tr>
@@ -117,6 +133,18 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
+<style>
+    .search {
+        position: relative;
+        box-shadow: 0 0 20px rgba(51, 51, 51, .1);
+    }
+    .search button {
+        position: absolute;
+        top: 4px;
+        right: 5px;
+        width: 80px;
+    }
+</style>
 <script>
     $(document).ready(function() {
     
