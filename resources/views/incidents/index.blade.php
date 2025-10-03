@@ -80,10 +80,15 @@
                         @forelse($incidents as $incident)
                             <tr>
                                 <td>
-                                   
                                     <a href="{{ url('incidents/'.$incident->id.'/edit') }}" class="btn btn btn-outline-info btn-sm" title="Edit Incident">
                                         <i class="mdi mdi-pencil"></i>
                                     </a>
+                                    <form method="POST" class="d-inline-block" action="{{url('delete_incident/'.$incident->id)}}" onsubmit="show()" enctype="multipart/form-data">
+                                        @csrf
+                                        <button type="button" class="btn btn-sm btn-outline-danger deleteBtn">
+                                            <i class="mdi mdi-trash-can"></i>
+                                        </button>
+                                    </form>
                                 </td>
                                 <td>{{ $incident->date }} {{ $incident->time }}</td>
                                 <td>{{ $incident->user->name }}</td>
@@ -132,6 +137,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <style>
     .search {
@@ -147,13 +155,25 @@
 </style>
 <script>
     $(document).ready(function() {
-    
-    // Initialize Select2 inside modals
-       
-            $('.select2').select2();
-  
+        $('.select2').select2();
+        
+        $(".deleteBtn").on('click', function() {
+            var form = $(this).closest('form')
 
-   
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit()
+                }
+            });
+        })
     });
 </script>
 @endsection

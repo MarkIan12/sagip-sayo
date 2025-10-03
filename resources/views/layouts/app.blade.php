@@ -20,7 +20,8 @@
     <!-- Icons Css -->
     <link href="{{asset('inside_css/assets/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
     <!-- App Css-->
-    <link href="{{asset('inside_css/assets/css/app.min.css')}}" rel="stylesheet" type="text/css" />
+    <!-- <link href="{{asset('inside_css/assets/css/app.min.css')}}" rel="stylesheet" type="text/css" /> -->
+    <link href="{{asset('inside_css/assets/css/app.css')}}" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="{{asset('inside_css/assets/css/custom.min.css')}}" rel="stylesheet" type="text/css" />
  
@@ -49,7 +50,8 @@
     <div id = "loader" style="display:none;" class="loader">
     </div>
     
-    <div class="auth-page-wrapper pt-5">
+    <!-- <div class="auth-page-wrapper pt-5"> -->
+    <div class="auth-page-wrapper">
         <!-- auth page bg -->
         <div class="auth-one-bg-position auth-one-bg" id="auth-particles">
             <div class="bg-overlay"></div>

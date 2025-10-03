@@ -155,8 +155,21 @@
                                 <div class="col-md-12">
                                     <label>Attachments <span class="optional">(optional)</span></label>
                                     <input type="file" name="attachment[]" multiple class="form-control">
-                                    @foreach($incident->attachments as $a)
+                                    {{-- @foreach($incident->attachments as $a)
                                         <div><a href="{{ asset($a->file_path) }}" target="_blank">{{ $a->file_name }}</a></div>
+                                    @endforeach --}}
+                                    @foreach($incident->attachments as $a)
+                                        <div class="d-flex align-items-center mb-2 attachment-row" id="attachment-{{ $a->id }}">
+                                            <a href="{{ asset($a->file_path) }}" target="_blank" class="me-2">
+                                                {{ $a->file_name }}
+                                            </a>
+
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-danger deleteAttachmentBtn" 
+                                                    data-id="{{ $a->id }}">
+                                                <i class="mdi mdi-trash-can"></i>
+                                            </button>
+                                        </div>
                                     @endforeach
                                 </div>
                                 <div class="col-md-12">
@@ -216,9 +229,14 @@
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <script>
 $(document).ready(function() {
@@ -317,6 +335,40 @@ $(document).ready(function() {
         } else {
             $('#other_incident_div').hide();
             $('#other_incident').removeAttr('required');
+        }
+    });
+});
+
+$(document).on('click', '.deleteAttachmentBtn', function () {
+    let attachmentId = $(this).data('id');
+    let row = $("#attachment-" + attachmentId);
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This attachment will be soft deleted.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "{{ url('/attachments') }}/" + attachmentId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        row.remove(); // remove from DOM
+                        Swal.fire('Deleted!', response.message, 'success');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error!', 'Failed to delete attachment.', 'error');
+                }
+            });
         }
     });
 });

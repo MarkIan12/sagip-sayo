@@ -15064,7 +15064,7 @@ span.flatpickr-weekday {
 }
 
 .auth-page-wrapper .auth-page-content {
-  padding-bottom: 60px;
+  /* padding-bottom: 60px; */
   position: relative;
   z-index: 2;
   width: 100%;
@@ -15090,7 +15090,7 @@ span.flatpickr-weekday {
 }
 
 .auth-one-bg {
-  background-image: url("../images/auth-one-bg.jpg");
+  background-image: url("../images/b-login.png");
   background-position: center;
   background-size: cover;
 }

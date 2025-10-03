@@ -61,23 +61,22 @@
                         <div class="navbar-brand-box horizontal-logo">
                             <a href="{{url('/')}}" class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="22">
+                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="100">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="17">
+                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="100">
                                 </span>
                             </a>
 
                             <a href="{{url('/')}}" class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="22">
+                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="100">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="17">
+                                    <img src="{{asset('images/Favicon.png')}}" alt="" height="100">
                                 </span>
                             </a>
                         </div>
-
                         <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger material-shadow-none" id="topnav-hamburger-icon">
                             <span class="hamburger-icon">
                                 <span></span>
@@ -85,13 +84,8 @@
                                 <span></span>
                             </span>
                         </button>
-
-                    
                     </div>
-
                     <div class="d-flex align-items-center">
-                         
-                        
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="d-flex align-items-center">
@@ -128,21 +122,21 @@
             <!-- LOGO -->
             <div class="navbar-brand-box">
                 <!-- Dark Logo-->
-                <a href="{{url('/')}}" class="logo logo-dark">
+                <!-- <a href="{{url('/')}}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{asset('images/Favicon.png')}}" alt="" height="22">
+                        <img src="{{asset('images/Favicon.png')}}" alt="" height="100">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{asset('images/Favicon.png')}}" alt="" height="17">
+                        <img src="{{asset('images/Favicon.png')}}" alt="" height="100">
                     </span>
-                </a>
+                </a> -->
                 <!-- Light Logo-->
                 <a href="{{url('/')}}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{asset('images/Favicon.png')}}" alt="" height="22">
+                        <img src="{{asset('images/logo-manda.png')}}" alt="" height="50">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{asset('images/Favicon.png')}}" alt="" height="17">
+                        <img src="{{asset('images/logo-manda.png')}}" alt="" height="50">
                     </span>
                 </a>
                 <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
@@ -172,17 +166,17 @@
                             <li class="menu-title"><span data-key="t-menu">Admin</span></li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="{{url('/streets')}}">
-                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Streets</span>
+                                    <i class="mdi mdi-road-variant"></i> <span data-key="t-dashboards">Streets</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="{{url('/barangays')}}">
-                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Barangays</span>
+                                    <i class="mdi mdi-town-hall"></i> <span data-key="t-dashboards">Barangays</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="{{url('/incident_types')}}">
-                                    <i class="ri-team-fill"></i> <span data-key="t-dashboards">Incident Types</span>
+                                    <i class="mdi mdi-cog"></i> <span data-key="t-dashboards">Incident Types</span>
                                 </a>
                             </li>
                             <li class="nav-item">

@@ -226,4 +226,26 @@ class IncidentController extends Controller
             return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update incident: ' . $e->getMessage()]);
         }
     }
+
+    public function destroy($id)
+    {
+        $attachment = IncidentAttachment::findOrFail($id);
+        $attachment->delete(); // Soft delete
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Attachment deleted successfully!'
+        ]);
+    }
+
+
+
+    public function delete(Request $request)
+    {
+        $incident_type = Incident::findOrFail($request->id);
+        $incident_type->delete();
+
+        Alert::success('Successfully Deleted')->persistent('Dismiss');
+        return back();
+    }
 }
