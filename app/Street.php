@@ -18,4 +18,9 @@ class Street extends Model implements Auditable
     {
         return $this->belongsTo(Barangay::class, 'barangay_id', 'id'); 
     }
+
+    public function incidents()
+    {
+        return $this->hasMany(Incident::class);
+    }
 }

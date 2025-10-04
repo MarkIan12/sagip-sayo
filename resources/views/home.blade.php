@@ -110,6 +110,10 @@
                         <div class="card-body">
                             <div id="barangays_incidents_chart" class="apex-charts" dir="ltr"></div>
                         </div>
+
+                        <div class="card-body">
+                            <div id="streets_incidents_chart" class="apex-charts" dir="ltr"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,6 +217,16 @@ var barangayChart = new ApexCharts(document.querySelector("#barangays_incidents_
     dataLabels: { enabled: true, style: { colors: ["#adb5bd"] } },
     series: [{ data: @json($barangayCounts->pluck('incidents_count')) }],
     xaxis: { categories: @json($barangayCounts->pluck('name')) }
+});
+barangayChart.render();
+
+// Street Incidents Chart
+var barangayChart = new ApexCharts(document.querySelector("#streets_incidents_chart"), {
+    chart: { type: 'bar', height: 550 },
+    plotOptions: { bar: { horizontal: true, distributed: true, borderRadius: 4, dataLabels: { position: 'top' } } },
+    dataLabels: { enabled: true, style: { colors: ["#adb5bd"] } },
+    series: [{ data: @json($streetCounts->pluck('incidents_count')) }],
+    xaxis: { categories: @json($streetCounts->pluck('name')) }
 });
 barangayChart.render();
 

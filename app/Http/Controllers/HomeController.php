@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Incident;
 use App\Barangay;
+use App\Street;
 use App\IncidentType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -43,6 +44,9 @@ class HomeController extends Controller
         // Barangay incidents (include all barangays even if 0)
         $barangayCounts = Barangay::withCount('incidents')->get();
 
+        // Streets incidents (include all street even if 0)
+        $streetCounts = Street::withCount('incidents')->get();
+
         // Monthly incidents (last 12 months)
         $monthlyIncidents = Incident::selectRaw("DATE_FORMAT(date, '%b %Y') as month")
                                     ->selectRaw("COUNT(*) as count")
@@ -62,7 +66,7 @@ class HomeController extends Controller
 
         return view('home', compact(
             'totalIncidents', 'thisMonthIncidents', 'avgPerMonth', 
-            'barangayCounts', 'monthlyIncidents', 'incidentTypes', 'latestIncidents'
+            'barangayCounts', 'monthlyIncidents', 'incidentTypes', 'latestIncidents', 'streetCounts'
         ));
     }
 }
