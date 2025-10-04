@@ -25,6 +25,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/incidents/{id}/edit','IncidentController@edit')->name('incidents.edit');
     Route::post('incidents/update/{id}','IncidentController@update')->name('incidents.update');
     Route::post('delete_incident/{id}', 'IncidentController@delete')->name('delete_incident');
+    Route::delete('delete_incident/{id}', 'IncidentController@delete1')->name('delete_incident1');
     Route::delete('/attachments/{id}', 'IncidentController@destroy')->name('attachments.destroy');
     Route::get('reports','IncidentReportController@index')->name('incidents.report');
 

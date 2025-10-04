@@ -229,7 +229,7 @@ class IncidentController extends Controller
     }
     public function map()
     {
-         $barangays = Barangay::all();
+        $barangays = Barangay::all();
         return view('incidents.map', compact('barangays'));
     }
 
@@ -274,7 +274,6 @@ class IncidentController extends Controller
         }
     }
 
-
     public function destroy($id)
     {
         $attachment = IncidentAttachment::findOrFail($id);
@@ -286,14 +285,23 @@ class IncidentController extends Controller
         ]);
     }
 
-
-
     public function delete(Request $request)
     {
-        $incident_type = Incident::findOrFail($request->id);
-        $incident_type->delete();
+        $incident = Incident::findOrFail($request->id);
+        $incident->delete();
 
         Alert::success('Successfully Deleted')->persistent('Dismiss');
         return back();
+    }
+
+    public function delete1($id)
+    {
+        $incident = Incident::findOrFail($id);
+        $incident->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Incident deleted successfully'
+        ]);
     }
 }

@@ -216,9 +216,10 @@
                         @endforeach
                     </div>
                     <button type="button" id="add-person" class="btn btn-secondary btn-sm">+ Add Person</button>
-
                     <hr>
-
+                    <button type="button" class="btn btn-danger deleteBtn" data-id="{{ $incident->id }}">
+                        Delete Incident
+                    </button>
                     <button type="submit" class="btn btn-primary">Update Incident</button>
                     <a href="{{ url('incidents') }}" class="btn btn-secondary">Cancel</a>
                 </form>
@@ -345,7 +346,7 @@ $(document).on('click', '.deleteAttachmentBtn', function () {
 
     Swal.fire({
         title: 'Are you sure?',
-        text: "This attachment will be soft deleted.",
+        text: "This attachment will be deleted.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -372,5 +373,52 @@ $(document).on('click', '.deleteAttachmentBtn', function () {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.deleteBtn').forEach(function(button) {
+        button.addEventListener('click', function () {
+            let incidentId = this.getAttribute('data-id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This incident will be permanently deleted!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("{{ url('delete_incident') }}/" + incidentId, {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Accept": "application/json",
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Deleted!',
+                                data.message,
+                                'success'
+                            ).then(() => {
+                                // Redirect or reload
+                                window.location.href = "{{ url('incidents') }}";
+                            });
+                        } else {
+                            Swal.fire('Error', 'Failed to delete incident.', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Error', 'Something went wrong!', 'error');
+                    });
+                }
+            });
+        });
+    });
+});
+
 </script>
 @endsection
