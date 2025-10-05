@@ -160,9 +160,7 @@
                                     @endforeach --}}
                                     @foreach($incident->attachments as $a)
                                         <div class="d-flex align-items-center mb-2 attachment-row" id="attachment-{{ $a->id }}">
-                                            <a href="{{ asset($a->file_path) }}" target="_blank" class="me-2">
-                                                {{ $a->file_name }}
-                                            </a>
+                                            <a href="{{ url('view-attachment/'.$a->id) }}" target="_blank">{{ $a->file_name }}</a>
 
                                             <button type="button" 
                                                     class="btn btn-sm btn-outline-danger deleteAttachmentBtn" 

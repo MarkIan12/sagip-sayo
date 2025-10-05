@@ -63,4 +63,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('deactivate/{id}', 'UserController@deactivate');
 
 
+    Route::get('/view-attachment/{id}', 'IncidentController@viewAttachment')->name('view.attachment');
+
+
 });

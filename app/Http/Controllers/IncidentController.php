@@ -11,6 +11,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Storage;
 
 class IncidentController extends Controller
 {
@@ -43,8 +44,7 @@ class IncidentController extends Controller
                     });
                 });
             })
-            ->orderBy('date', 'desc')
-            ->orderBy('time', 'desc')
+            ->orderBy('id','desc')
             ->paginate(10)
             ->appends($request->query());
 
@@ -116,12 +116,12 @@ class IncidentController extends Controller
             if ($request->hasFile('attachment')) {
                 foreach ($request->file('attachment') as $file) {
                     if ($file->isValid()) {
-                        $filename = time() . '_' . $file->getClientOriginalName();
-                        $file->move(public_path('uploads/incidents'), $filename);
-
+                        $file = $file;
+                        $path = Storage::disk('s3')->put('uploads', $file);
+                        // dd($path);?
                         $attachment = new IncidentAttachment;
                         $attachment->incident_id = $new_incident->id;
-                        $attachment->file_path = 'uploads/incidents/' . $filename;
+                        $attachment->file_path = $path;
                         $attachment->file_name = $file->getClientOriginalName();
                         $attachment->save();
                     }
@@ -303,5 +303,20 @@ class IncidentController extends Controller
             'success' => true,
             'message' => 'Incident deleted successfully'
         ]);
+    }
+
+    public function viewAttachment($id)
+    {
+        $attachment = IncidentAttachment::findOrFail($id);
+        $filePath = $attachment->file_path;
+
+        // If using S3, generate a temporary URL
+        if (Storage::disk('s3')->exists($filePath)) {
+            $url = Storage::disk('s3')->temporaryUrl($filePath, now()->addMinutes(5));
+            return redirect($url);
+        }
+
+        // If the file does not exist, return a 404 error
+        abort(404, 'File not found');
     }
 }

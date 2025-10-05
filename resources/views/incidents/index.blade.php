@@ -115,7 +115,7 @@
                                 </td>
                                 <td>
                                     @foreach($incident->attachments as $a)
-                                        <div><a href="{{ asset($a->file_path) }}" target="_blank">{{ $a->file_name }}</a></div>
+                                        <div><a href="{{ url('view-attachment/'.$a->id) }}" target="_blank">{{ $a->file_name }}</a></div>
                                     @endforeach
                                 </td>
                                 <td>{{$incident->enforcer_name}}</td>
