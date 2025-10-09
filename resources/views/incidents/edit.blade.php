@@ -201,7 +201,7 @@
                             </div>
                             <div class="col-md-2">
                                 <select name="persons[{{ $i }}][is_main]" class="form-control" required>
-                                    <option value="1" {{ $p->is_main ? 'selected' : '' }}>Main</option>
+                                    <option value="1" {{ $p->is_main ? 'selected' : '' }}>Driver</option>
                                     <option value="0" {{ !$p->is_main ? 'selected' : '' }}>Passenger</option>
                                 </select>
                             </div>

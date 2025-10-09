@@ -3,6 +3,7 @@
 @section('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <style>
     #map {
         height: 300px;
@@ -34,7 +35,7 @@
             </div>
 
             <div class="card-body">
-                <form action="{{ url('incidents/store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ url('incidents/store') }}" method="POST" onsubmit="show();" enctype="multipart/form-data">
                     @csrf
 
                     <div class="row g-3">
@@ -89,7 +90,7 @@
                         </div>
                         <div class="col-md-6 d-flex align-items-center">
                             <label class="me-3">Police Notified? <span class="optional">(optional)</span></label>
-                            <input type="checkbox" name="police_notified" value="1">
+                            <input type="checkbox" name="police_notified" checked value="1">
                         </div>
                     </div>
                     <hr>
@@ -170,32 +171,23 @@
                     <hr>
 
                     <!-- Persons Involved -->
-                    <h6>Persons Involved</h6>
-                    <div id="persons-wrapper">
-                        <div class="row g-3 person-item mb-2">
-                            <div class="col-md-3">
-                                <label class="required">Name</label>
-                                <input type="text" name="persons[0][name]" class="form-control" placeholder="Name" required>
+                    <div class='row'>
+                        <div class='col-md-6'>
+                            <h5>Vehicle</h5>
+                            <div id="vehicle-wrapper">
                             </div>
-                            <div class="col-md-3">
-                                <label class="required">Address</label>
-                                <input type="text" name="persons[0][address]" class="form-control" placeholder="Address" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="required">Contact</label>
-                                <input type="text" name="persons[0][contact]" class="form-control" placeholder="Contact" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="required">Role</label>
-                                <select name="persons[0][is_main]" class="form-control" required>
-                                    <option value="1">Main</option>
-                                    <option value="0">Passenger</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2"></div>
+                            <button type="button" id="add-vehicle" class="btn btn-secondary btn-sm">+ Add Vehicle</button>
                         </div>
+                        <div class='col-md-6'>
+                            <h5>Persons Involved</h5>
+                            <div id="persons-wrapper">
+                            </div>
+                            <button type="button" id="add-person" class="btn btn-secondary btn-sm">+ Add Person</button>
+                        </div>
+                      
                     </div>
-                    <button type="button" id="add-person" class="btn btn-secondary btn-sm">+ Add Person</button>
+                            
+                   
 
                     <hr>
 
@@ -313,31 +305,25 @@ $(document).ready(function() {
 
     // Dynamic persons
     let personIndex = 1;
-    $('#add-person').click(function () {
-        $('#persons-wrapper').append(`
-            <div class="row g-3 person-item mb-2">
-                <div class="col-md-3">
-                    <input type="text" name="persons[${personIndex}][name]" class="form-control" placeholder="Name">
-                </div>
-                <div class="col-md-3">
-                    <input type="text" name="persons[${personIndex}][address]" class="form-control" placeholder="Address">
-                </div>
-                <div class="col-md-2">
-                    <input type="text" name="persons[${personIndex}][contact]" class="form-control" placeholder="Contact">
-                </div>
-                <div class="col-md-2">
-                    <select name="persons[${personIndex}][is_main]" class="form-control">
-                        <option value="1">Main</option>
-                        <option value="0">Passenger</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger remove-person">X</button>
-                </div>
-            </div>
-        `);
-        personIndex++;
-    });
+    // $('#add-person').click(function () {
+    //     $('#persons-wrapper').append(`
+    //         <div class="row g-3 person-item mb-2">
+    //             <div class="col-md-3">
+    //                 <input type="text" name="persons[${personIndex}][name]" class="form-control" placeholder="Name">
+    //             </div>
+    //             <div class="col-md-2">
+    //                 <select name="persons[${personIndex}][is_main]" class="form-control">
+    //                     <option value="1">Driver</option>
+    //                     <option value="0">Passenger</option>
+    //                 </select>
+    //             </div>
+    //             <div class="col-md-2">
+    //                 <button type="button" class="btn btn-danger remove-person">X</button>
+    //             </div>
+    //         </div>
+    //     `);
+    //     personIndex++;
+    // });
 
     $(document).on('click', '.remove-person', function () {
         $(this).closest('.person-item').remove();
@@ -357,5 +343,106 @@ $(document).ready(function() {
     });
 });
 </script>
+
+<script>
+    $(document).ready(function() {
+        let vehicleIndex = 1;
+        let personIndex = 1;
+    
+        // Add Vehicle
+        $('#add-vehicle').click(function () {
+            $('#vehicle-wrapper').append(`
+                <div class="row g-3 vehicle-item mb-2">
+                    <div class="col-md-6">
+                        <select name="vehicle[${vehicleIndex}][type]" class="form-control vehicle-select" required>
+                            <option value="Car">Car</option>
+                            <option value="Motorcycle">Motorcycle</option>
+                            <option value="Truck">Truck</option>
+                            <option value="Bicycle">Bicycle</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="vehicle[${vehicleIndex}][plate_number]" class="form-control" placeholder="Plate Number">
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                       <button type="button" class="btn btn-danger remove-vehicle w-100">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    </div>
+                </div>
+            `);
+    
+            updateVehicleDropdowns();
+            vehicleIndex++;
+        });
+    
+        // Remove Vehicle
+        $(document).on('click', '.remove-vehicle', function () {
+            $(this).closest('.vehicle-item').remove();
+            updateVehicleDropdowns();
+        });
+    
+        // Add Person
+        $('#add-person').click(function () {
+            $('#persons-wrapper').append(`
+                <div class="row g-3 person-item mb-2">
+                    <div class="col-md-5">
+                        <input type="text" name="persons[${personIndex}][name]" class="form-control" placeholder="Name" required>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="persons[${personIndex}][is_main]" class="form-control" required>
+                            <option value="Victim">Victim</option>
+                            <option value="Suspect">Suspect</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="persons[${personIndex}][vehicle]" class="form-control vehicle-dropdown" required>
+                            ${getVehicleOptions()}
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                       <button type="button" class="btn btn-danger remove-person w-100">
+                        <i class="bi bi-person"></i>
+                    </button>
+                    </div>
+                </div>
+            `);
+            personIndex++;
+        });
+    
+        // Remove Person
+        $(document).on('click', '.remove-person', function () {
+            $(this).closest('.person-item').remove();
+        });
+    
+        // Update dropdown in persons when vehicle changes
+        $(document).on('change', '.vehicle-select, input[name^="vehicle"][name$="[plate_number]"]', function() {
+            updateVehicleDropdowns();
+        });
+    
+        // Helper: Build vehicle options
+        function getVehicleOptions() {
+            let options = `<option value="">-- Select Vehicle --</option>`;
+            $('.vehicle-item').each(function(index) {
+                let type = $(this).find('select[name^="vehicle"]').val() || 'Unknown';
+                let plate = $(this).find('input[name^="vehicle"]').val() || '';
+                let label = plate ? `${type} - ${plate}` : `${type}`;
+                options += `<option value="${label}">${label}</option>`;
+            });
+            return options;
+        }
+    
+        // Helper: Update all person vehicle dropdowns
+        function updateVehicleDropdowns() {
+            let options = getVehicleOptions();
+            $('.vehicle-dropdown').each(function() {
+                let currentVal = $(this).val();
+                $(this).html(options);
+                $(this).val(currentVal);
+            });
+        }
+    });
+    </script>
 @endsection
 
